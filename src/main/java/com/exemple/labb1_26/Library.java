@@ -1,6 +1,7 @@
 package com.exemple.labb1_26;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 public class Library {
 
@@ -19,9 +20,11 @@ public class Library {
         this.counterMember = 0;
         this.isBorrowed = new boolean[14];
         this.borrowedBy = new Member[14];
-        //Då blir borrowed[0] status för book[0]
+        //Då blir isBorrowed[0] status för book[0], om jag hade t.ex. [6] och användaren
+        //vill låna bok 8, då kraschar systemet
     }
 
+    //Den behövs inte, den ska bort
     public Library(Book books) {
         this.books = new Book[]{books};
         this.counterBook = 1;
@@ -29,11 +32,10 @@ public class Library {
     }
 
 
-
     public Book addBook(Book book) {  //add new books (return book in another method?)
         if (counterBook >= books.length) {
 
-            growBookArray(); //todo kan man inte använda samma grow array till bägge b och m?
+            growBookArray();
         }
         books[counterBook++] = book;
         return book;
@@ -48,9 +50,14 @@ public class Library {
         return member;
     }
 
-
+    //Dynamiskt växande arrayer, jag måste få de att växa för isBorrowed och borrowedBy!
     private void growBookArray() {
-        books = Arrays.copyOf(books, books.length * 2);
+
+        int newSize = books.length * 2;
+
+        books = Arrays.copyOf(books, newSize);
+        isBorrowed = Arrays.copyOf(isBorrowed, newSize);
+        borrowedBy = Arrays.copyOf(borrowedBy, newSize  );
     }
 
     private void growMembersArray() {
@@ -83,16 +90,43 @@ public class Library {
 
     }
 
-    //Linjär sökning
+    //Linjär sökning. Nu väntar metoden på ett sökord t.ex. library.findBook("tolkien")
+    //Detta här är för användaren
     public void findBook(String text) {
         text = text.toLowerCase();
+
+        boolean found = false;
 
         for (int i = 0; i < counterBook; i++) {
             if (books[i].title().toLowerCase().contains(text) || books[i].author().toLowerCase().contains(text)) {
                 System.out.println(books[i]);
-
+                found = true;
             }
         }
+        if (!found) {
+            System.out.println("No books found");
+        }
+    }
+
+    //och detta är för systemets interna arbete
+    public int findBookIndex(String title) {
+        for (int i = 0; i < counterBook; i++) {
+            if (books[i].title().equalsIgnoreCase(title)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
+
+    public Member findMember(String memberID) {
+        for (int i = 0; i < counterMember; i++) {
+            if (members[i].getMemberID().equals(memberID)) {
+                return members[i];
+            }
+        }
+        return null;
     }
 
     //Utskrift
@@ -148,68 +182,4 @@ public class Library {
     public int sizeMember() {
         return counterMember;
     }
-
-      */
-    //Nej! till den här metoden. Enligt copilot. Vi ska inte ta bort en bok från biblioteket vid utlåningen!
-    //den ska ju finnas kvar i biblioteket.
-    /*
-    public void removeAtIndex(int index) {
-        for (int i = index; i < counterBook - 1; i++) {
-            books[i] = books[i + 1];
-        }
-        counterBook--;
-    }
-   */
-
-
-    //Den här biten kan strykas än så länge för att designen bakom
-    //utlåningen inte verkar bestämd ännu.
-    /*
-    public void returnAtIndex(int index) {
-        books[index].setAvailable(true);
-    }
-    private boolean setAvailable() {
-        if (returnAtIndex() == true)
-            return true;
-        else
-            return false;
-    }
-    */
-
-
-
-
-
-    /*
-    public void sort() {
-        var copy = Arrays.copyOfRange(books, 0, counterBook);
-        BubbleSort.sort(copy);
-        books = copy;
-    }
-    private void BubbleSort() {
-    } */
-
-
-
-
-
-/*Library (klass) — huvudklassen som håller arrayer med böcker och medlemmar (fast storlek),
-samt en array/struktur som håller reda på vilka böcker som är utlånade och till vem
-Datalagring: böcker och medlemmar lagras i arrayer med fast storlek (ingen
-ArrayList/Collections). Hantera fallet att arrayen är full
-*/
-
-/*Library class:
-•	Book array
-•	Member array
-•	Loan information
-
-Members och book ska användas av library.
-Library ska äga Book[] books, Member[] members.
-
-Library kanske kan kontrollera?
-1.	finns medlemmen?
-2.	finns boken?
-3.	får medlemmen låna?
-
  */
