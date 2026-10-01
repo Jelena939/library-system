@@ -1,7 +1,6 @@
 package com.exemple.labb1_26;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 public class Library {
 
@@ -15,24 +14,19 @@ public class Library {
 
     public Library() {
         this.books = new Book[14];
-        this.members = new Member[6];
+        this.members = new Member[7];
         this.counterBook = 0;
         this.counterMember = 0;
         this.isBorrowed = new boolean[14];
         this.borrowedBy = new Member[14];
-        //Då blir isBorrowed[0] status för book[0], om jag hade t.ex. [6] och användaren
-        //vill låna bok 8, då kraschar systemet
     }
 
-    //Den behövs inte, den ska bort
     public Library(Book books) {
         this.books = new Book[]{books};
         this.counterBook = 1;
-
     }
 
-
-    public Book addBook(Book book) {  //add new books (return book in another method?)
+    public Book addBook(Book book) {
         if (counterBook >= books.length) {
 
             growBookArray();
@@ -41,56 +35,16 @@ public class Library {
         return book;
     }
 
-    public Member addMember(Member member) {
-        if (counterMember >= members.length) {
-
-            growMembersArray();
-        }
-        members[counterMember++] = member;
-        return member;
-    }
-
-    //Dynamiskt växande arrayer, jag måste få de att växa för isBorrowed och borrowedBy!
     private void growBookArray() {
 
         int newSize = books.length * 2;
 
         books = Arrays.copyOf(books, newSize);
         isBorrowed = Arrays.copyOf(isBorrowed, newSize);
-        borrowedBy = Arrays.copyOf(borrowedBy, newSize  );
+        borrowedBy = Arrays.copyOf(borrowedBy, newSize);
     }
 
-    private void growMembersArray() {
-        members = Arrays.copyOf(members, members.length * 2);
-    }
-
-
-    public boolean borrowBook(int bookIndex, Member member) {
-        if (isBorrowed[bookIndex]) {
-            return false;
-        }
-        if (!member.borrow()) {
-            return false;
-        }
-        isBorrowed[bookIndex] = true;
-        borrowedBy[bookIndex] = member;
-
-        return true;
-    }
-
-    public boolean returnBook(int bookIndex) {
-        if (!isBorrowed[bookIndex]) {
-            return false;
-        }
-        borrowedBy[bookIndex].returnBack();
-        borrowedBy[bookIndex] = null;
-        isBorrowed[bookIndex] = false;
-
-        return true;
-
-    }
-
-    //Linjär sökning. Nu väntar metoden på ett sökord t.ex. library.findBook("tolkien")
+    //Linjär sökning.
     //Detta här är för användaren
     public void findBook(String text) {
         text = text.toLowerCase();
@@ -118,6 +72,45 @@ public class Library {
         return -1;
     }
 
+    public boolean borrowBook(int bookIndex, Member member) {
+        if (isBorrowed[bookIndex]) {
+            return false;
+        }
+        if (!member.borrow()) {
+            return false;
+        }
+        isBorrowed[bookIndex] = true;
+        borrowedBy[bookIndex] = member;
+
+        return true;
+    }
+
+    public boolean returnBook(int bookIndex) {
+        if (!isBorrowed[bookIndex]) {
+            return false;
+        }
+        borrowedBy[bookIndex].returnBack();
+        borrowedBy[bookIndex] = null;
+        isBorrowed[bookIndex] = false;
+
+        return true;
+    }
+
+    public boolean addMember(Member member) {
+        if (findMember(member.getMemberID()) != null) {
+            return false; //Säger att: Member with the same ID already exists
+        }
+        if (counterMember >= members.length) {
+
+            growMembersArray();
+        }
+        members[counterMember++] = member;
+        return true;
+    }
+
+    private void growMembersArray() {
+        members = Arrays.copyOf(members, members.length * 2);
+    }
 
 
     public Member findMember(String memberID) {
@@ -129,10 +122,9 @@ public class Library {
         return null;
     }
 
-    //Utskrift
     public void showBooks() {
         for (int i = 0; i < counterBook; i++) {
-            System.out.println(books[i]);
+            System.out.println(i + ": " + books[i].title() + " by " + books[i].author());
 
             if (isBorrowed[i]) {
                 System.out.println("Borrowed by " + borrowedBy[i].getName());
@@ -145,41 +137,8 @@ public class Library {
 
     public void showMembers() {
         for (int i = 0; i < counterMember; i++) {
-            System.out.println(members[i]);
+            System.out.println(i + ". MemberID " + members[i].getMemberID() + " - " + members[i].getName() +
+                                " \t (active loans: " + members[i].getActiveLoans() + ")");
         }
     }
 }
-
-
-
-
-//Jag liksom måste ha de men... Får se senare om den kommer till användning
-//Visar en bok på ett visst index
-//    public Book getBookValue(int index) {
-//        if (index < 0 || index >= counterBook) {
-//            throw new IndexOutOfBoundsException("Invalid index: " + index);
-//        }
-//        return books[index];
-//    }
-//
-//    public Member getMemberValue(int index) {
-//        if (index < 0 || index >= counterMember) {
-//            throw new IndexOutOfBoundsException("Invalid index: " + index);
-//        }
-//        return members[index];
-//    }
-
-
-
-
-
-    //Visar hur många böcker finns i min biblioteket
-    //Får se senare om den kommer till användning
-        /*
-    public int sizeBook() {
-        return counterBook;
-    }
-    public int sizeMember() {
-        return counterMember;
-    }
- */

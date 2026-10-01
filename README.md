@@ -6,29 +6,24 @@ Java Library System
 - Intellij IDEA 2026.2.3
 - Maven build tool
 - Git 2.55.0.windows.5
-- GitHub Jelena939  jelena.aleksejeva@iths.se  GPG-key verified 
+- GitHub Jelena939  jelena.aleksejeva@iths.se
 
 
 ## Författare 
 Jelena Aleksejeva
 
-## OBS! 
-Jag hade tyvärr trasslat mig in med brancher när jag skapade projektet.
-Jag har försökt lösa det, och det verkar som att jag lyckades, på ett något 
-provisoriskt sätt. Däremot resulterade röran i att jag commitade Book-record
-och README.md ett par gånger utan vettiga ändringar, bara för att kolla att 
-det funkar. Självklart lär man sig och senare i livet kommer man att agera
-mer professionellt. Kanske...
-
 ## Projektstruktur
 
 - src/main/java/com/exemple/labb1_26
-    - Books.java - record som innehåller final data som titel, författare, ISBN.
-    - Members.java - klass som ska innehålla logik kring medlemmar och lån.
-    - LibrarySystem.java - klass som innehåller arrayer för medlemmar och böcker; den 
-samordnar allt. 
-  - Library (Main.java) - interaktiv gränssnitt som användaren ser. Det är "en bild på 
-skärmen som åskådaren iakttar." Allt annat är teknologi bakom.
+    - Book.java - record som innehåller oföränderlig data om böcker som titel, författare, ISBN.
+    - Member.java - klass som innehåller logik kring enskilda medlemmar och lån.
+    - Library.java - klass sköter logik kring medlem- och bokklasser och kopplar den till main metoden 
+  LibrarySystem. Klassen innehåller arrayer med medlemmar och böcker; arrayer växer när nya medlemmar
+  och böcker läggs till. Klassen innehåller metoder som söker, adderar och visar bok- och medlemslistor
+  samt hanterar utlåning, returnering av böcker.
+  - LibrarySystem.java - gränssnitt där användaren interagerar med programmet. Innehåller menyn med
+  olika val och länkar den till aktuella metoder i Library klassen och visar resultatet av användarens val.
+  
   
     
 ## Reflektion
@@ -40,4 +35,9 @@ och själva record ändras inte efter skapandet.
 Däremot skapar jag en klass för att lagra information om medlemmar. Klasser används
 när objektets tillstånd kan ändras dvs när objektet har ett beteende, så som 
 medlemmar i min bibliotek: de kan, t.ex., låna och returnera böcker.
+
+Så tanken är att användaren läser menyn och gör ett val. Valet anropar en specifik metod i
+Library klassen. Library klassen sköter aktuell samarbete mellan medlems- och bokklasser
+och kopplar den tillbaka till main genom att returnera svar. Pågår så länge tills användaren
+väljer att avsluta programmet.
 

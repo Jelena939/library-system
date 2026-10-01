@@ -5,7 +5,7 @@ public class LibrarySystem {
 
         Library library = new Library();
 
-        //Böcker
+        //Boklistan (fyller 12 platser av 14; efteråt får array växa)
         library.addBook(new Book("Florentine", "Emiko Davies", "9781743796764"));
         library.addBook(new Book("Cuisine on screen", "Sachiyo Harada", "9783791393216"));
         library.addBook(new Book("Asiatiska smaker", "Jennie Wallden", "9789174246209"));
@@ -19,62 +19,41 @@ public class LibrarySystem {
         library.addBook(new Book("Italian Cuisine: a Cultural History", "Massimo Montanari", "9780231122320"));
         library.addBook(new Book("Chiltern Firehouse the Cookbook", "Nuno Mendes", "9781848094659"));
 
-        //Medlemmar
-        Member member0 = library.addMember(new Member("1111", "Frodo Baggins", 0));
-        Member member1 = library.addMember(new Member("2222", "Samwise Gamgee", 0));
-        Member member2 = library.addMember(new Member("3333", "Gandalf the Grey", 0));
-        Member member3 = library.addMember(new Member("4444", "Bilbo Baggins", 0));
-        Member member4 = library.addMember(new Member("5555", "Sauron", 0));
-        Member member5 = library.addMember(new Member("6666", "Gimli", 0));
+        //Medlemslistan (fyller 6 platser av 7; efteråt får array växa)
+        library.addMember(new Member("1111", "Frodo Baggins"));
+        library.addMember(new Member("2222", "Samwise Gamgee"));
+        library.addMember(new Member("3333", "Gandalf the Grey"));
+        library.addMember(new Member("4444", "Bilbo Baggins"));
+        library.addMember(new Member("5555", "Sauron"));
+        library.addMember(new Member("6666", "Gimli"));
 
-
-        Member member = library.findMember("1111");
-        /*
-        Todo 1. Programmet ska köra i en loop och visa en meny tills användaren väljer att avsluta. YAS
-
-        todo 2. Meny & interaktivitet: en robust meny (Scanner) som hanterar felaktig inmatning (t.ex.
-todo bokstäver där siffror förväntas) utan att programmet kraschar. YAS
-
-todo 6. Felhantering: tydliga meddelanden vid t.ex. bok/medlem som inte hittas, bok som redan är
-todo utlånad, eller ogiltiga menyval — programmet ska aldrig krascha på grund av felaktig inmatning.
-         */
         boolean running = true;
         do {
             printMenu();
 
             var choice = IO.readln("Enter your choice: ");
 
-            //Det här gör att tecken som inte är siffror 1 till 7 (t.ex. bokstäver, symboler, 106)
-            //fångas och inte ger krasch!
-            //Skulle jag använt int istället för String, då måste jag använda try/catch annars
-            //kraschar programmet när anv skriver in bokstäver där siffror förväntas
-            //Princip: Om du läser in data som String först och validerar den innan
-            //konvertering, blir programmet ofta mycket robustare.
-            if (!choice.matches("[1-7]")) {
-                System.out.println("You must enter a number between 1 and 7.");
+            if (!choice.matches("[1-8]")) {
+                System.out.println("You must enter a number between 1 and 8.");
                 continue;
             }
 
             switch (choice) {
                 case "1" -> addBook(library); //På så sätt händer metod anrop
-                case "2" -> findBook(library);//När användaren väljer alternativ 2 ska jag: 1. Fråga efter söktext.
-                //2. Ta emot söktexten. 3. Skicka söktexten till library.findBook(...).
-                case "3" -> borrowBook(library); //todo 4. kontrollera att boken
-                //todo finns och inte redan är utlånad.
+                case "2" -> findBook(library);
+                case "3" -> borrowBook(library);
                 case "4" -> returnBook(library);
                 case "5" -> addMember(library);
-                case "6" -> showBooks(library); //todo 5.Visa samtliga böcker
-                //todo med status (utlånad/tillgänglig och till vem)
-                case "7" -> running = false;
+                case "6" -> showBooks(library);
+                case "7" -> showMembers(library);
+                case "8" -> running = false;
                 default -> System.out.println("Invalid choice. Please try again.");
-
             }
 
         } while (running);
-
-
     }
 
+    //Fungerar! (testar felaktig inmatning som: 8, f, @)
     public static void printMenu() {
         String menuText = """
                 Menu
@@ -87,38 +66,45 @@ todo utlånad, eller ogiltiga menyval — programmet ska aldrig krascha på grun
                 4. Return a book
                 5. Add a new member
                 6. Show all books
-                7. Exit
+                7. Show all members
+                8. Exit
                 """;
         System.out.println(menuText);
     }
 
-    //fylla in alla metoder enligt hur den ser ut
+    //Fungerar! (yes, array växer när man lägger till fler böcker än det finns platser)
     private static void addBook(Library library) {
+
         String title = IO.readln("Enter book title: ");
         String author = IO.readln("Enter book author: ");
         String isbn = IO.readln("Enter book ISBN: ");
 
         Book book = new Book(title, author, isbn);
-        library.addBook(book); //jag måste lägga den på ett tomt plats i array
+
+        library.addBook(book);
+
+        System.out.println("Book added successfully!");
     }
 
+    //Fungerar! (toLower; author vs title)
     private static void findBook(Library library) {
 
-        //Den här hela scharangen kunde jag skriva in i switch
         String searchText = IO.readln("Enter title or author: ");
 
         library.findBook(searchText);
     }
 
+    //Fungerar! (MAX loans, toLower); men inte på del av titel
     private static void borrowBook(Library library) {
 
-        String text = IO.readln("Enter book title or author: ");
+        String text = IO.readln("Enter book title: ");
         String memberID = IO.readln("Enter member ID: ");
         int bookIndex = library.findBookIndex(text);
         if(bookIndex == -1) {
             System.out.println("Book not found");
             return;
         }
+
         Member member = library.findMember(memberID);
         if(member == null) {
             System.out.println("Member not found");
@@ -128,67 +114,50 @@ todo utlånad, eller ogiltiga menyval — programmet ska aldrig krascha på grun
         if(success)
             System.out.println("Book borrowed successfully");
         else
-            System.out.println("Book could not be borrowed");
-     }
+            System.out.println("This book is already borrowed or reader has " +
+                    "reached maximum number of loans allowed for one member");
+    }
 
+     //Fungerar
     private static void returnBook(Library library){
 
-
+        String text = IO.readln("Enter book title: ");
+        int bookIndex = library.findBookIndex(text);
+        if(bookIndex == -1) {
+            System.out.println("Book not found");
+            return;
+        }
+        if (library.returnBook(bookIndex))
+            System.out.println("Book returned successfully");
+        else
+            System.out.println("Book could not be returned");
     }
 
+    //Fungerar. (hindrar medlemmar med samma ID, array växer)
     private static void addMember(Library library){
 
+        String memberID = IO.readln("Enter new member ID: ");
+        String name = IO.readln("Enter name: ");
+        Member member = new Member(memberID, name);
+
+        boolean added = library.addMember(member); //samma princip som med success
+        if (added) {
+            System.out.println("New member added successfully");
+        }
+        else {
+            System.out.println("Member with ID " + member.getMemberID() + " already exists. " +
+                    "Choose another combination.");
+        }
     }
 
+    //Funkar (Shows books in order, shows if available or if isBorrowed and by whom)
     private static void showBooks(Library library){
         library.showBooks();
-
-
     }
 
 
-
-
-
-
+    //Funkar (updates active loans)
+    private static void showMembers(Library library){
+        library.showMembers();
+    }
 }
-
-
-/*
-  boolean running = true;
-        do {
-            printMenu();
-
-            var choice = IO.readln("Enter your choice: ");
-
-            //Det här gör att tecken som inte är siffror 1 till 7 (t.ex. bokstäver, symboler, 106)
-            //fångas och inte ger krasch!
-            //Skulle jag använt int istället för String, då måste jag använda try/catch annars
-            //kraschar programmet när anv skriver in bokstäver där siffror förväntas
-            //Princip: Om du läser in data som String först och validerar den innan
-            //konvertering, blir programmet ofta mycket robustare.
-            if (!choice.matches("[1-7]")) {
-                System.out.println("You must enter a number between 1 and 7.");
-                continue;
-            }
-
-            switch (choice) {
-                case "1" -> System.out.println("You choose to add a book");
-                case "2" -> System.out.println("You chose to search for a book.");//todo 3. Söka bok på (del av)
-                //todo titel eller författare, skiftlägesokänsligt, via egen sökloop (linjärsökning)
-                case "3" -> System.out.println("You chose to borrow a book."); //todo 4. kontrollera att boken
-                //todo finns och inte redan är utlånad.
-                case "4" -> System.out.println("You choose to return a book.");
-                case "5" -> System.out.println("You chose to add a new member.");
-                case "6" -> System.out.println("You chose to show all books."); //todo 5.Visa samtliga böcker
-                //todo med status (utlånad/tillgänglig och till vem)
-                case "7" -> System.exit(0);
-                default -> System.out.println("Invalid choice. Please try again.");
-
-            }
-
-        } while (running);
-
-
-
- */
